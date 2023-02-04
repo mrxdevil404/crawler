@@ -3,20 +3,27 @@ from webbrowser import open as op_w
 from os.path import isfile
 from random import choice
 from colorama import Fore
-from requests import get
 from json import loads
 from os import remove
 from sys import argv
-import ast
+import ast , requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 w = Fore.WHITE
 c = Fore.CYAN
 g = Fore.GREEN
 r = Fore.RED
 y = Fore.YELLOW
 colors = [w, c, y, g, r]
-if iden() != "Windows":
- from readline import parse_and_bind
- parse_and_bind('tab:complete')
+def pass_to_burp():
+    proxies = {"http": "http://127.0.0.1:8080", "https": "http://127.0.0.1:8080"}
+    names_f = ["urls.txt" , "hostnames.txt" , "Web_archieves_urls.txt" , "results_crawlers.txt"]
+    for file_n in names_f:
+        if isfile(file_n):
+            with open(file_n , 'r')as f:
+                for url in f.readlines():
+                    url = url.rstrip()
+                    req = requests.get(url ,verify=False , proxies=proxies)
 def banner():
  colors = [w , r , g , c , y]
  print (f"""{choice(colors)}       
@@ -40,7 +47,7 @@ def del_repeat( name ):
                     fx.write(line.rstrip() + '\n')
                 fx.close()
 def otx_crawls( target ):
-    req = loads(get(f"https://otx.alienvault.com/api/v1/indicators/domain/{target}/url_list?limit=10000000&page=1").text)["url_list"]
+    req = loads(requests.get(f"https://otx.alienvault.com/api/v1/indicators/domain/{target}/url_list?limit=10000000&page=1").text)["url_list"]
     f_u = open("urls.txt" , 'w')
     f_h = open("hostnames.txt" , 'w')
     for i in req:
@@ -55,11 +62,11 @@ def otx_crawls( target ):
     f_h.close()
 def web_arch( target ):
     with open ("Web_archieves_urls.txt" , 'a')as f2:
-        x = loads(get("https://web.archive.org/cdx/search?url="+target+"%2F&matchType=prefix&collapse=urlkey&output=json&fl=original%2Cmimetype%2Ctimestamp%2Cendtimestamp%2Cgroupcount%2Cuniqcount&filter=!statuscode%3A%5B45%5D..&limit=100000&_=1547318148315").text)
+        x = loads(requests.get("https://web.archive.org/cdx/search?url="+target+"%2F&matchType=prefix&collapse=urlkey&output=json&fl=original%2Cmimetype%2Ctimestamp%2Cendtimestamp%2Cgroupcount%2Cuniqcount&filter=!statuscode%3A%5B45%5D..&limit=100000&_=1547318148315").text)
         for url in x:
             f2.write (url[0] + '\n')
 def crawls( target ):
-    req = get(f"http://index.commoncrawl.org/CC-MAIN-2018-22-index?url=*.{target}/*&output=json")
+    req = requests.get(f"http://index.commoncrawl.org/CC-MAIN-2018-22-index?url=*.{target}/*&output=json")
     with open(f"{target}.json" , 'a')as f:
         f.write(req.text)
     f_r = open("results_crawlers.txt" , 'a')
@@ -88,10 +95,10 @@ Example:
 
 # Not https:// or http:// or www.
 
-1. ./{0} -n 1 -t hackerone.com  -> index.commoncrawl.org
-2. ./{0} -n 2 -t hackerone.com  -> otx.alienvault.com
-3. ./{0} -n 3 -t hackerone.com  -> web.archieve
-4. ./{0} -n All -t hackerone.com -> All Of Them
+1. ./{0} -n 1 -t hackerone.com -burp   -> index.commoncrawl.org
+2. ./{0} -n 2 -t hackerone.com -burp   -> otx.alienvault.com
+3. ./{0} -n 3 -t hackerone.com -burp   -> web.archieve
+4. ./{0} -n All -t hackerone.com -burp -> All Of Them
 
 """.format(argv[0]))
 else:
@@ -121,5 +128,8 @@ else:
         else:
             print (f"{w}[{g}+{w}] Open This Link : https://otx.alienvault.com/indicator/domain/{target}")
         del_repeat(["urls.txt" , "hostnames.txt", "Web_archieves_urls.txt", "results_crawlers.txt"])
+        if "-burp" in argv[1:]:
+            print (f"{w}[{g}+{w}] Pass Results to burp")
+            pass_to_burp()
     except Exception as e:
         print (e)
