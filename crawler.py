@@ -65,14 +65,17 @@ def otx_crawls( target ):
     f_h.close()
 def virustotal_crawls( target ):
     f_v = open("virustotal_urls.txt" , 'a')
-    req = requests.get(f"https://www.virustotal.com/vtapi/v2/domain/report?apikey=006f48df28c3aca049dd5aab2b010df8b7b1fa10440c60914fdf074c398b670d&domain={target}").text
-    list_urls = loads(req)["undetected_urls"]
-    for sub_list in list_urls:
-        for url in sub_list:
-            if url.startswith("http"):
-                print ( url )
-                f_v.write( url + '\n' )
-                break
+    try:
+        req = requests.get(f"https://www.virustotal.com/vtapi/v2/domain/report?apikey=006f48df28c3aca049dd5aab2b010df8b7b1fa10440c60914fdf074c398b670d&domain={target}").text
+        list_urls = loads(req)["undetected_urls"]
+        for sub_list in list_urls:
+            for url in sub_list:
+                if url.startswith("http"):
+                    print ( url )
+                    f_v.write( url + '\n' )
+                    break
+    except Exception as e:
+     print (e)
     f_v.close()
 def web_arch( target ):
     with open ("Web_archieves_urls.txt" , 'a')as f2:
@@ -114,7 +117,7 @@ Example:
 2. ./{0} -n 2 -t hackerone.com -burp   -> otx.alienvault.com
 3. ./{0} -n 3 -t hackerone.com -burp   -> web.archieve
 4. ./{0} -n 4 -t hackerone.com -burp   -> virustotal.com
-5. ./{0} -n All -f domains.txt -burp   -> All Of Them
+5. ./{0} -n All -t hackerone.com -burp -> All Of Them
 
 """.format(argv[0]))
 else:
