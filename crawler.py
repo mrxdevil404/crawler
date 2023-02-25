@@ -114,7 +114,7 @@ Example:
 2. ./{0} -n 2 -t hackerone.com -burp   -> otx.alienvault.com
 3. ./{0} -n 3 -t hackerone.com -burp   -> web.archieve
 4. ./{0} -n 4 -t hackerone.com -burp   -> virustotal.com
-5. ./{0} -n All -t hackerone.com -burp -> All Of Them
+5. ./{0} -n All -f domains.txt -burp   -> All Of Them
 
 """.format(argv[0]))
 else:
