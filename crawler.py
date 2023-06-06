@@ -17,7 +17,7 @@ y = Fore.YELLOW
 colors = [w, c, y, g, r]
 def pass_to_burp():
     proxies = {"http": "http://127.0.0.1:8080", "https": "http://127.0.0.1:8080"}
-    names_f = ["urls.txt" , "hostnames.txt" , "Web_archieves_urls.txt" , "results_crawlers.txt", "virustotal_urls.txt"]
+    names_f = [ "hostnames.txt" , "Web_archieves_urls.txt" , "results_crawlers.txt", "virustotal_urls.txt"]
     for file_n in names_f:
         if isfile(file_n):
             with open(file_n , 'r')as f:
@@ -129,14 +129,11 @@ else:
                         if number == '1':
                             crawls( new_target )
                         elif number == '2':
-                            otx_crawls( new_target )
-                        elif number == '3':
                             web_arch( new_target )
-                        elif number == '4':
+                        elif number == '3':
                             virustotal_crawls( new_target )
                         elif number == 'All':
                             crawls( new_target )
-                            otx_crawls( new_target )
                             web_arch( new_target )
                             virustotal_crawls( new_target )
         if number == '1':
@@ -155,7 +152,7 @@ else:
                 virustotal_crawls( target )
         else :
             exit (f"{w}[{r}!{w}] Incorrect Select")
-        del_repeat(["urls.txt" , "hostnames.txt", "Web_archieves_urls.txt", "results_crawlers.txt", "virustotal_urls.txt"])
+        del_repeat([ "hostnames.txt", "Web_archieves_urls.txt", "results_crawlers.txt", "virustotal_urls.txt"])
         if "-burp" in argv[1:]:
             print (f"{w}[{g}+{w}] Pass Results to burp")
             pass_to_burp()
