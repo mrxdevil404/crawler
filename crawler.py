@@ -51,26 +51,6 @@ def del_repeat( name ):
                 for line in data :
                     fx.write(line.rstrip() + '\n')
                 fx.close()
-def otx_crawls( target ):
-    for i in range(1, 99999999999999999999999999999999):
-     req = loads(requests.get(f"https://otx.alienvault.com/api/v1/indicators/domain/{target}/url_list?limit=10000000&page={i}").text)["url_list"]
-     f_u = open("urls.txt" , 'a')
-     f_h = open("hostnames.txt" , 'w')
-     for i in req:
-         try:
-          if req == []:break
-          if not i.get("httpcode") in range(499,599):
-             print (choice(colors))
-             print (f"URL : {i.get('url')}")
-             print (f"HOSTNAME : {str(i.get('hostname'))}\n")
-             print (f'{choice(colors)}-----------------------------------------')
-             f_u.write (i.get("url") + '\n')
-             f_h.write (i.get("hostname") + '\n')
-         except Exception as e:
-          print (e)
-          continue
-    f_u.close()
-    f_h.close()
 def virustotal_crawls( target ):
     f_v = open("virustotal_urls.txt" , 'a')
     try:
@@ -122,10 +102,9 @@ Example:
 # Not https:// or http:// or www.
 
 1. ./{0} -n 1 -t hackerone.com -burp   -> index.commoncrawl.org
-2. ./{0} -n 2 -t hackerone.com -burp   -> otx.alienvault.com
-3. ./{0} -n 3 -t hackerone.com -burp   -> web.archieve
-4. ./{0} -n 4 -t hackerone.com -burp   -> virustotal.com
-5. ./{0} -n All -t hackerone.com -burp -> All Of Them
+2. ./{0} -n 2 -t hackerone.com -burp   -> web.archieve
+3. ./{0} -n 3 -t hackerone.com -burp   -> virustotal.com
+4. ./{0} -n All -t hackerone.com -burp -> All Of Them
 
 """.format(argv[0]))
 else:
@@ -152,14 +131,11 @@ else:
                         if number == '1':
                             crawls( new_target )
                         elif number == '2':
-                            otx_crawls( new_target )
-                        elif number == '3':
                             web_arch( new_target )
-                        elif number == '4':
+                        elif number == '3':
                             virustotal_crawls( new_target )
                         elif number == 'All':
                             crawls( new_target )
-                            otx_crawls( new_target )
                             web_arch( new_target )
                             virustotal_crawls( new_target )
                         if iden() == 'Windows':
@@ -169,17 +145,13 @@ else:
                 crawls( target )
         elif number == '2':
             if not "-f" in argv[1:]:
-                otx_crawls( target )
-        elif number == '3':
-            if not "-f" in argv[1:]:
                 web_arch( target )
-        elif number == '4':
+        elif number == '3':
             if not "-f" in argv[1:]:
                 virustotal_crawls( target )
         elif number == 'All':
             if not "-f" in argv[1:]:
                 crawls( target )
-                otx_crawls( target )
                 web_arch( target )
                 virustotal_crawls( target )
         else :
