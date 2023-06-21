@@ -9,6 +9,8 @@ from sys import argv
 import ast , requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+from urlextract import URLExtract
+extractor = URLExtract()
 w = Fore.WHITE
 c = Fore.CYAN
 g = Fore.GREEN
@@ -17,7 +19,7 @@ y = Fore.YELLOW
 colors = [w, c, y, g, r]
 def pass_to_burp():
     proxies = {"http": "http://127.0.0.1:8080", "https": "http://127.0.0.1:8080"}
-    names_f = [ "hostnames.txt" , "Web_archieves_urls.txt" , "results_crawlers.txt", "virustotal_urls.txt"]
+    names_f = ["urls.txt" , "hostnames.txt" , "Web_archieves_urls.txt" , "results_crawlers.txt", "virustotal_urls.txt"]
     for file_n in names_f:
         if isfile(file_n):
             with open(file_n , 'r')as f:
@@ -49,6 +51,26 @@ def del_repeat( name ):
                 for line in data :
                     fx.write(line.rstrip() + '\n')
                 fx.close()
+def otx_crawls( target ):
+    for i in range(1, 99999999999999999999999999999999):
+     req = loads(requests.get(f"https://otx.alienvault.com/api/v1/indicators/domain/{target}/url_list?limit=10000000&page={i}").text)["url_list"]
+     f_u = open("urls.txt" , 'a')
+     f_h = open("hostnames.txt" , 'w')
+     for i in req:
+         try:
+          if req == []:break
+          if not i.get("httpcode") in range(499,599):
+             print (choice(colors))
+             print (f"URL : {i.get('url')}")
+             print (f"HOSTNAME : {str(i.get('hostname'))}\n")
+             print (f'{choice(colors)}-----------------------------------------')
+             f_u.write (i.get("url") + '\n')
+             f_h.write (i.get("hostname") + '\n')
+         except Exception as e:
+          print (e)
+          continue
+    f_u.close()
+    f_h.close()
 def virustotal_crawls( target ):
     f_v = open("virustotal_urls.txt" , 'a')
     try:
@@ -100,9 +122,10 @@ Example:
 # Not https:// or http:// or www.
 
 1. ./{0} -n 1 -t hackerone.com -burp   -> index.commoncrawl.org
-2. ./{0} -n 2 -t hackerone.com -burp   -> web.archieve
-3. ./{0} -n 3 -t hackerone.com -burp   -> virustotal.com
-4. ./{0} -n All -t hackerone.com -burp -> All Of Them
+2. ./{0} -n 2 -t hackerone.com -burp   -> otx.alienvault.com
+3. ./{0} -n 3 -t hackerone.com -burp   -> web.archieve
+4. ./{0} -n 4 -t hackerone.com -burp   -> virustotal.com
+5. ./{0} -n All -t hackerone.com -burp -> All Of Them
 
 """.format(argv[0]))
 else:
@@ -129,32 +152,47 @@ else:
                         if number == '1':
                             crawls( new_target )
                         elif number == '2':
-                            web_arch( new_target )
+                            otx_crawls( new_target )
                         elif number == '3':
+                            web_arch( new_target )
+                        elif number == '4':
                             virustotal_crawls( new_target )
                         elif number == 'All':
                             crawls( new_target )
+                            otx_crawls( new_target )
                             web_arch( new_target )
                             virustotal_crawls( new_target )
+                        if iden() == 'Windows':
+                            op_w(f'https://otx.alienvault.com/indicator/domain/{new_target}')
         if number == '1':
             if not "-f" in argv[1:]:
                 crawls( target )
         elif number == '2':
             if not "-f" in argv[1:]:
-                web_arch( target )
+                otx_crawls( target )
         elif number == '3':
+            if not "-f" in argv[1:]:
+                web_arch( target )
+        elif number == '4':
             if not "-f" in argv[1:]:
                 virustotal_crawls( target )
         elif number == 'All':
             if not "-f" in argv[1:]:
                 crawls( target )
+                otx_crawls( target )
                 web_arch( target )
                 virustotal_crawls( target )
         else :
             exit (f"{w}[{r}!{w}] Incorrect Select")
-        del_repeat([ "hostnames.txt", "Web_archieves_urls.txt", "results_crawlers.txt", "virustotal_urls.txt"])
+        if iden() == "Windows":
+            if not "-f" in argv[1:]:
+                op_w(f'https://otx.alienvault.com/indicator/domain/{target}')
+        else:
+            if not "-f" in argv[1:]:
+                print (f"{w}[{g}+{w}] Open This Link : https://otx.alienvault.com/indicator/domain/{target}")
+        del_repeat(["urls.txt" , "hostnames.txt", "Web_archieves_urls.txt", "results_crawlers.txt", "virustotal_urls.txt"])
         if "-burp" in argv[1:]:
             print (f"{w}[{g}+{w}] Pass Results to burp")
             pass_to_burp()
     except Exception as e:
-        print (e)
+        pass
